@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MusicalHeart</string>
+    <string name="action_createalarm">+</string>
+    <string name="createalarm_label">Create Alarm</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_alarm">Alarm</string>
+    <string name="title_activity_alarm">AlarmActivity</string>
+    <string name="title_activity_set_alarm">SetAlarmActivity</string>
+    <string name="setalarm_label">Set Alarm</string>
+    <string name="date_label">Choose Date</string>
+    <string name="time_label">Choose Time</string>
+    <string name="save_button">Save</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="locreminder">Category Based Reminder</string>
+    <string name="startbutton">Start</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_add_reminder">AddReminder</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="savebutton">Save</string>
+    <string name="forgetbutton">Forget it</string>
+    <string name="lblremindme">Remind Me About</string>
+    <string name="lblDate">Date</string>
+    <string name="lbltime">Time</string>
+    <string name="lbllocation">Location</string>
+    <string name="title_activity_add_location">AddLocation</string>
+    <string name="title_add_location">Add Location</string>
+    <string name="ad_category">Category</string>
+    <string name="category_prompt">Choose a category</string>
+    <string name="title_activity_alarm_notification">AlarmNotification</string>
+
+</resources>
