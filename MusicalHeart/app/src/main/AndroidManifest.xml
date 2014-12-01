@@ -2,19 +2,40 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.project.cmpe277.musicalheart" >
 
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="edu.project.cmpe277.musicalheart.HeartBeatActivity"
+            android:name="edu.project.cmpe277.musicalheart.DeviceScanActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name="edu.project.cmpe277.musicalheart.DeviceControlActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:name="edu.project.cmpe277.musicalheart.HeartBeatActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name="edu.project.cmpe277.musicalheart.AlarmActivity"
@@ -31,6 +52,10 @@
 
         <service
             android:name=".NotificationService"
+            android:enabled="true" />
+
+        <service
+            android:name="edu.project.cmpe277.musicalheart.BluetoothLeService"
             android:enabled="true" />
 
         <receiver android:name=".AlarmService" />
