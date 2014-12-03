@@ -21,21 +21,29 @@
 package edu.project.cmpe277.musicalheart;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,6 +66,14 @@ public class DeviceScanActivity extends ListActivity {
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
+
+    private String wifiName;
+    // The BroadcastReceiver that tracks network connectivity changes.
+    private WifiReceiver receiver = new WifiReceiver();
+
+    private final String TAG = "DeviceScanActivity";
+
+    AlertDialog playerDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -114,12 +130,61 @@ public class DeviceScanActivity extends ListActivity {
                 break;
             case R.id.action_settings:
                 break;
+            case R.id.wifi:
+            {
+                //This feature is implemented in order to bring the player to the foreground if
+                // the device is connected to the home wifi.
+                Log.v(TAG, "In Wifi submenu");
+                showWifiEnableDialog(DeviceScanActivity.this);
+                break;
+            }
+            case R.id.default_player:
+            {
+                Log.v(TAG, "In Default Player submenu");
+                showDefaultPlayerDialog(DeviceScanActivity.this);
+                break;
+            }
             case R.id.action_alarm:
                 Intent intent = new Intent(this,AlarmActivity.class);
                 startActivity(intent);
                 break;
         }
         return true;
+    }
+
+    private void showDefaultPlayerDialog(DeviceScanActivity deviceScanActivity) {
+
+
+
+
+
+// Strings to Show In Dialog with Radio Buttons
+        final CharSequence[] items = {" Spotify "," MediaPlayer "};
+
+        // Creating and Building the Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select the player");
+        builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+
+
+                switch(item)
+                {
+                    case 0: //spotify
+                        // Your code when first option seletced
+                        Log.v(TAG,"Spotify has been selected");
+                        break;
+                    case 1: //Media Player
+                        // Your code when 2nd  option selected
+                        Log.v(TAG,"Medial Player has been selected");
+
+                        break;
+                }
+                playerDialog.dismiss();
+            }
+        });
+        playerDialog = builder.create();
+        playerDialog.show();
     }
 
     @Override
@@ -156,6 +221,85 @@ public class DeviceScanActivity extends ListActivity {
         super.onPause();
         scanLeDevice(false);
         mLeDeviceListAdapter.clear();
+    }
+
+    private void showWifiEnableDialog(final Context aContext) {
+
+        // get prompts.xml view
+        LayoutInflater li = LayoutInflater.from(aContext);
+        View promptsView = li.inflate(R.layout.dialog_wifi, null);
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                aContext);
+
+        // set prompts.xml to alertdialog builder
+        alertDialogBuilder.setView(promptsView);
+
+        final EditText userInput = (EditText) promptsView
+                .findViewById(R.id.editTextDialogUserInput);
+
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton(R.string.button_enable,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // get user input and set it to wifiName
+                                // edit text
+                                wifiName = userInput.getText().toString();
+                                Log.v(TAG, "Wifiname = " + wifiName);
+
+                                //Store the home wifiname in shared preference
+                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(DeviceScanActivity.this);
+                                SharedPreferences.Editor editor = preferences.edit();
+
+                                editor.putString("wifi",wifiName.toString().trim());
+
+                                editor.apply();
+
+
+                                IntentFilter intentFilter = new IntentFilter("myReceiver");
+                                intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+                                intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+                                intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+                                intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
+                                registerReceiver(receiver, intentFilter);
+
+                                //Send data to the broadcastreceiver, onReceive()
+
+                                Intent intent = new Intent("myReceiver");
+                                intent.putExtra("wifi", wifiName);
+                                sendBroadcast(intent);
+
+
+                            }
+                        })
+                .setNegativeButton(R.string.button_cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Unregisters BroadcastReceiver when app is destroyed.
+        if (receiver != null) {
+            this.unregisterReceiver(receiver);
+        }
+
+
+
     }
 
     @Override

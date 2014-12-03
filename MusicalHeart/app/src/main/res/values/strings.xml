@@ -60,4 +60,12 @@
     <string name="menu_start_logging">Start logging</string>
     <string name="menu_stop_logging">Stop logging</string>
 
+    <!-- Home wifi setting -->
+    Set Home Wifi
+    <string name="menu_wifi"> Set Home Wifi</string>
+    <string name="menu_player"> Default Player</string>
+    <string name="wifidialog_title"> Type your home wifi name : </string>
+    <string name="wifitoast_message"> Connected to wifi : </string>
+    <string name="button_enable"> Enable </string>
+    <string name="button_cancel"> Cancel </string>
 </resources>

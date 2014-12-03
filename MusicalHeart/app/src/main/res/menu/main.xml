@@ -33,6 +33,15 @@
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom" />
+        android:showAsAction="always">
+        <menu>
+            <item android:id="@+id/wifi"
+                android:title="@string/menu_wifi">
+            </item>
+            <item android:id="@+id/default_player"
+                android:title="@string/menu_player">
+            </item>
+        </menu>
+    </item>
 
 </menu>
