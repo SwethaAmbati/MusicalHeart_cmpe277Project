@@ -34,7 +34,12 @@
             </intent-filter>
         </activity>
         <activity android:name="edu.project.cmpe277.musicalheart.DeviceControlActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name="edu.project.cmpe277.musicalheart.HeartBeatActivity"

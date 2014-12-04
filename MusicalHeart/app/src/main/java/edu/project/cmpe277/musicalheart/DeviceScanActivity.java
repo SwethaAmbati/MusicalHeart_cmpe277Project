@@ -155,29 +155,34 @@ public class DeviceScanActivity extends ListActivity {
     private void showDefaultPlayerDialog(DeviceScanActivity deviceScanActivity) {
 
 
-
-
-
-// Strings to Show In Dialog with Radio Buttons
+    // Strings to Show In Dialog with Radio Buttons
         final CharSequence[] items = {" Spotify "," MediaPlayer "};
 
         // Creating and Building the Dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select the player");
+
         builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-
 
                 switch(item)
                 {
                     case 0: //spotify
                         // Your code when first option seletced
                         Log.v(TAG,"Spotify has been selected");
+                        SharedPreferences preferences = getSharedPreferences("player",Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("defaultPlayer","spotify");
+                        editor.apply();
+
                         break;
                     case 1: //Media Player
                         // Your code when 2nd  option selected
                         Log.v(TAG,"Medial Player has been selected");
-
+                        SharedPreferences preferences1 = getSharedPreferences("player",Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor1 = preferences1.edit();
+                        editor1.putString("defaultPlayer","media");
+                        editor1.apply();
                         break;
                 }
                 playerDialog.dismiss();

@@ -21,6 +21,7 @@
 package edu.project.cmpe277.musicalheart;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
@@ -42,6 +43,8 @@ import com.dropbox.client2.DropboxAPI.Entry;
 
 import android.os.Environment;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -701,9 +704,27 @@ public class DeviceControlActivity extends Activity {
 		logging = false;
 
         if(pulse > 0) {
-            Intent playSpotify = new Intent(this, MainActivity.class);
-            playSpotify.putExtra(MainActivity.EXTRAS_DATA, pulse);
-            startActivity(playSpotify);
+            SharedPreferences sharedPreferences = getSharedPreferences("player",Context.MODE_PRIVATE);
+            String player = sharedPreferences.getString("defaultPlayer", null);
+            Log.i(TAG,"The Player is "+player);
+            if(player.equals("spotify")) {
+                Intent playSpotify = new Intent(this, MainActivity.class);
+                playSpotify.putExtra(MainActivity.EXTRAS_DATA, pulse);
+                startActivity(playSpotify);
+            }
+            else if(player.equals("media")) {
+                mPlaySpotify = false;
+                Intent intent = new Intent();
+                intent.setAction(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
+                //String genre = intent.getStringExtra("android.intent.extra.genre");
+                //String artist = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ARTIST);
+                //String title = intent.getStringExtra(MediaStore.EXTRA_MEDIA_TITLE);
+                String playlist = intent.getStringExtra("android.intent.extra.playlist");
+
+                intent.putExtra(SearchManager.QUERY, "");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
         }
 	}
 }
