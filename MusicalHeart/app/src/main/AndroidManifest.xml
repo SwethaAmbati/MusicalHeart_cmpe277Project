@@ -52,6 +52,21 @@
             android:name="edu.project.cmpe277.musicalheart.AlarmNotification"
             android:label="@string/title_activity_alarm_notification" >
         </activity>
+        <activity
+            android:name="edu.project.cmpe277.musicalheart.MainActivity"
+            android:label="MainActivity"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="callback"
+                    android:scheme="my-test-app"/>
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".NotificationService"

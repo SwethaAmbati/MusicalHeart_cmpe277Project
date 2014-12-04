@@ -129,6 +129,7 @@ public class DeviceControlActivity extends Activity {
 	private String mDeviceAddress;
 	private String mDeviceUUID;
 	private String mDeviceOthers;
+    private Boolean mPlaySpotify;
 	/*private ImageButton mButtonStart;
 	private ImageButton mButtonStop;
 	private ImageButton mButtonSend;*/
@@ -256,12 +257,16 @@ public class DeviceControlActivity extends Activity {
 						.getSupportedGattServices());
 				// mButtonStop.setVisibility(View.VISIBLE);
 			} else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-				displayData(intent
-						.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                String pulse = intent
+                        .getStringExtra(BluetoothLeService.EXTRA_DATA);
+				displayData(pulse);
 				displayStatus("Available");
 			}
 		}
 	};
+
+
+
 
 	private void clearUI() {
 		// mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
@@ -278,12 +283,12 @@ public class DeviceControlActivity extends Activity {
 		setContentView(R.layout.heartrate);
 
 		// getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+        mPlaySpotify = false;
 		final Intent intent = getIntent();
 		mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
 		mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-		mDeviceUUID = intent.getStringExtra(EXTRAS_DEVICE_UUID);
-		mDeviceOthers = intent.getStringExtra(EXTRAS_DEVICE_OTHERS);
+		//mDeviceUUID = intent.getStringExtra(EXTRAS_DEVICE_UUID);
+		//mDeviceOthers = intent.getStringExtra(EXTRAS_DEVICE_OTHERS);
 		// Set up database connection
         /*datasource = new EventsDataSource(this);
         datasource.open();*/
@@ -294,7 +299,7 @@ public class DeviceControlActivity extends Activity {
 
 		mDataField = (TextView) findViewById(R.id.data_value);
 		mOtherField = (TextView) findViewById(R.id.other_value);
-		mOtherField.setText(mDeviceName+";"+mDeviceAddress+";"+mDeviceUUID+";"+mDeviceOthers+";");
+		mOtherField.setText(mDeviceName+";"+mDeviceAddress);
 		/*mButtonSend = (ImageButton) findViewById(R.id.btnSend);
 		mButtonSend.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -456,7 +461,7 @@ public class DeviceControlActivity extends Activity {
 			startLogging();
 			return true;
 		case R.id.menu_stop_logging:
-			stopLogging();
+			stopLogging(0);
 			return true;
 		case android.R.id.home:
 			onBackPressed();
@@ -481,15 +486,25 @@ public class DeviceControlActivity extends Activity {
 	}*/
 
 	int x = 0;
-
+    int cnter = 0;
 	private void displayData(String data) {
 		try {
 			if (data != null) {
 
+                if(!mPlaySpotify)
+                {
+                    if(cnter > 5){
+                        Log.i(TAG,"Inside play spotify");
+                        mPlaySpotify = true;
+                        stopLogging(Integer.parseInt(data));
+                    }
+                    cnter++;
+                }
+
 				long time = (new Date()).getTime();
 				int dataElement = Integer.parseInt(data);
 				//mCurrentSeries.add(time, dataElement);
-				appendLog((new Date()).toString() + "," + data);
+				//appendLog((new Date()).toString() + "," + data);
 				//datasource.createEvent(1, time, dataElement);
 				// Storing last 600 only - should average... 
 				/*while (mCurrentSeries.getItemCount() > 60*10) {
@@ -547,8 +562,8 @@ public class DeviceControlActivity extends Activity {
 
 		// Loops through available GATT Services.
 		for (BluetoothGattService gattService : gattServices) {
-			Log.i(TAG, "Looping gattService");
-			HashMap<String, String> currentServiceData = new HashMap<String, String>();
+
+            HashMap<String, String> currentServiceData = new HashMap<String, String>();
 			uuid = gattService.getUuid().toString();
 			currentServiceData.put(LIST_NAME,
 					SampleGattAttributes.lookup(uuid, unknownServiceString));
@@ -670,18 +685,25 @@ public class DeviceControlActivity extends Activity {
 		//mButtonSend.setVisibility(View.VISIBLE);
 		//mButtonStop.setVisibility(View.VISIBLE);
 		//mButtonStart.setVisibility(View.GONE);
+
 		mBluetoothLeService.setCharacteristicNotification(
 				mNotifyCharacteristic, true);
 		invalidateOptionsMenu();
 		logging = true;
 	}
 
-	private void stopLogging() {
+	private void stopLogging(int pulse) {
 		//mButtonStop.setVisibility(View.GONE);
 		//mButtonStart.setVisibility(View.VISIBLE);
 		mBluetoothLeService.setCharacteristicNotification(
 				mNotifyCharacteristic, false);
 		invalidateOptionsMenu();
 		logging = false;
+
+        if(pulse > 0) {
+            Intent playSpotify = new Intent(this, MainActivity.class);
+            playSpotify.putExtra(MainActivity.EXTRAS_DATA, pulse);
+            startActivity(playSpotify);
+        }
 	}
 }

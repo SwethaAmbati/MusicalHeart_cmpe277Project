@@ -197,6 +197,7 @@ public class DeviceScanActivity extends ListActivity {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+
             }
         }
 
@@ -309,8 +310,7 @@ public class DeviceScanActivity extends ListActivity {
         final Intent intent = new Intent(this, DeviceControlActivity.class);
         intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-        intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_UUID, device.getUuids());
-        intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_OTHERS, device.getType());
+
         if (mScanning) {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             mScanning = false;
