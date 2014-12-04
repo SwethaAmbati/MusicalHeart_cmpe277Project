@@ -86,7 +86,7 @@ String delete;
         try
         {
             HashMap<String, String> map= new HashMap<String, String>();
-            map.put("category", "Reminders");
+         //   map.put("category", "Reminders");
             mylist.add(map);
             SQLiteDatabase db = openOrCreateDatabase("AlarmList.db", Context.MODE_PRIVATE,null);
             Cursor cursor = db.rawQuery("SELECT * FROM ReminderMessage", null);

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+ <color name="list">#BDBDBD</color>
+    <string name="action_home">Home</string>
     <string name="app_name">MusicalHeart</string>
     <string name="action_createalarm">+</string>
     <string name="createalarm_label">Create Alarm</string>
@@ -18,7 +19,7 @@
     <string name="locreminder">Category Based Reminder</string>
     <string name="startbutton">Start</string>
     <string name="title_activity_register">RegisterActivity</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="hello_world">Welcome to Muscial Heart</string>
     <string name="title_activity_add_reminder">AddReminder</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>

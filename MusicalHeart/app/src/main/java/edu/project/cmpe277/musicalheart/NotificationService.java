@@ -34,7 +34,7 @@ public class NotificationService extends Service{
         super.onStart(intent, startId);
         String val = "Start Playing";
         NotificationManager notificationManager = (NotificationManager) this.getApplicationContext().getSystemService(this.getApplicationContext().NOTIFICATION_SERVICE);
-        Intent notificationIntent = new Intent(this.getApplicationContext(),HeartBeatActivity.class);
+        Intent notificationIntent = new Intent(this.getApplicationContext(),DeviceScanActivity.class);
         notificationIntent.putExtra("message", val);
         notificationIntent.putExtra("reminder", true);
 

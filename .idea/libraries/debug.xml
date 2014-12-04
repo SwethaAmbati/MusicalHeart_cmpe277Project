@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="debug">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/MusicalHeart/app/build/intermediates/pre-dexed/debug/achartengine-1.1.0-a2529fd94a4ab46d8e8c252cca2c7a2359e67899.jar!/" />
+      <root url="jar://$PROJECT_DIR$/MusicalHeart/app/build/intermediates/pre-dexed/debug/dropbox-android-sdk-1.5.4-1cf892aea52b3140285380534c79863a0aebaf38.jar!/" />
+      <root url="jar://$PROJECT_DIR$/MusicalHeart/app/build/intermediates/pre-dexed/debug/commons-logging-1.1.1-a7526ef19dc424dfa6c4ac704fc441dd13c10663.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

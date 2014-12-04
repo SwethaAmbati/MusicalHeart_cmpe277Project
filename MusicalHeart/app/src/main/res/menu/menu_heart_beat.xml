@@ -4,10 +4,10 @@
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom" />
+        android:showAsAction="never" />
 
     <item android:id="@+id/action_alarm"
         android:title="@string/action_alarm"
         android:orderInCategory="200"
-        android:showAsAction="ifRoom" />
+        android:showAsAction="never" />
 </menu>

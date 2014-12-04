@@ -6,7 +6,11 @@
 
     <item android:id="@+id/action_createalarm"
         android:title="@string/action_createalarm"
-        android:orderInCategory="100" android:showAsAction="ifRoom" />
+        android:orderInCategory="100"
+
+        android:icon="@drawable/ic_action_add"
+
+        android:showAsAction="ifRoom" />
 
 
 

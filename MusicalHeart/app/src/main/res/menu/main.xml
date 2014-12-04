@@ -17,21 +17,32 @@
     <item android:id="@+id/menu_refresh"
           android:checkable="false"
           android:orderInCategory="1"
-          android:showAsAction="ifRoom"/>
+          android:showAsAction="ifRoom"
+        android:title="" />
+
+    <item android:id="@+id/action_home"
+        android:title="@string/menu_stop"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_action_home"
+        android:showAsAction="ifRoom"/>
     <item android:id="@+id/menu_scan"
           android:title="@string/menu_scan"
           android:orderInCategory="100"
-          android:showAsAction="ifRoom|withText"/>
+        android:icon="@drawable/ic_action_reload"
+          android:showAsAction="always"/>
     <item android:id="@+id/menu_stop"
         android:title="@string/menu_stop"
+        android:icon="@drawable/ic_action_playback_stop"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="always"/>
     <item android:id="@+id/action_alarm"
         android:title="@string/action_alarm"
+        android:icon="@drawable/ic_action_alarm"
         android:orderInCategory="200"
-        android:showAsAction="ifRoom|withText" />
+        android:showAsAction="always" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
+        android:icon="@drawable/ic_action_gear"
         android:orderInCategory="100"
         android:showAsAction="always">
         <menu>

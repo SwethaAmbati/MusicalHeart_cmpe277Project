@@ -15,13 +15,20 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
+   android:background="@drawable/custom_list"
+    android:paddingLeft="7sp"
+    android:paddingRight="7sp"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
     <TextView android:id="@+id/device_name"
+ android:paddingLeft="5sp"
+        android:paddingRight="5sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="24dp"/>
+            android:textSize="20dp"/>
     <TextView android:id="@+id/device_address"
+   android:paddingLeft="5sp"
+        android:paddingRight="5sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12dp"/>

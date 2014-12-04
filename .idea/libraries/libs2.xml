@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/MusicalHeart/app/libs/dropbox-android-sdk-1.5.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/MusicalHeart/app/libs/achartengine-1.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/MusicalHeart/app/libs/commons-logging-1.1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
