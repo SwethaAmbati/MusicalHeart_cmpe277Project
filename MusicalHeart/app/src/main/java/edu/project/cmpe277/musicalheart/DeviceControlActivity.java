@@ -55,6 +55,7 @@ import android.widget.LinearLayout;
 //import android.widget.ExpandableListView;
 //import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -84,6 +85,13 @@ import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.TokenPair;
+import com.spotify.sdk.android.Spotify;
+import com.spotify.sdk.android.authentication.AuthenticationResponse;
+import com.spotify.sdk.android.authentication.SpotifyAuthentication;
+import com.spotify.sdk.android.playback.ConnectionStateCallback;
+import com.spotify.sdk.android.playback.Player;
+import com.spotify.sdk.android.playback.PlayerNotificationCallback;
+import com.spotify.sdk.android.playback.PlayerState;
 
 //import pro.apus.heartrate.R;
 
@@ -93,7 +101,8 @@ import com.dropbox.client2.session.TokenPair;
  * device. The Activity communicates with {@code BluetoothLeService}, which in
  * turn interacts with the Bluetooth LE API.
  */
-public class DeviceControlActivity extends Activity {
+public class DeviceControlActivity extends Activity implements
+        PlayerNotificationCallback, ConnectionStateCallback {
 	private final static String TAG = DeviceControlActivity.class
 			.getSimpleName();
 
@@ -113,15 +122,15 @@ public class DeviceControlActivity extends Activity {
 	private EventsDataSource datasource;
 	
 	// Dropbox
-	/*private DropboxAPI<AndroidAuthSession> mDBApi;
+	private DropboxAPI<AndroidAuthSession> mDBApi;
 	private AccessTokenPair dropboxTokens = null;
-	final static private String APP_KEY = "tjyi4o6psg0dm0r";
-	final static private String APP_SECRET = "jp6054yixb9t9e0";
-	final static private AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
+    final static private String APP_KEY = "";
+    final static private String APP_SECRET = "";
+    final static private AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
 	final static private String ACCOUNT_PREFS_NAME = "prefs";
 	final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
 	final static private String ACCESS_SECRET_NAME = "ACCESS_SECRET";
-	private boolean uploadFileRequested = false;*/
+	private boolean uploadFileRequested = false;
 
 	// Various UI stuff
 	public static boolean currentlyVisible;
@@ -134,17 +143,17 @@ public class DeviceControlActivity extends Activity {
 	private String mDeviceOthers;
     private Boolean mPlaySpotify;
 	/*private ImageButton mButtonStart;
-	private ImageButton mButtonStop;
-	private ImageButton mButtonSend;*/
+	private ImageButton mButtonStop;*/
+	//private ImageButton mButtonSend;
 
 	// Chart stuff
-	/*private GraphicalView mChart;
+	private GraphicalView mChart;
 	private XYMultipleSeriesDataset mDataset = new XYMultipleSeriesDataset();
 	private XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
 	private XYSeries mCurrentSeries;
-	private XYSeriesRenderer mCurrentRenderer;*/
+	private XYSeriesRenderer mCurrentRenderer;
 
-	/*private void initChart() {
+	private void initChart() {
 
 		Log.i(TAG, "initChart");
 		if (mCurrentSeries == null) {
@@ -204,7 +213,7 @@ public class DeviceControlActivity extends Activity {
 			mRenderer.addSeriesRenderer(mCurrentRenderer);
 		}
 	}
-	 */
+
 	// Code to manage Service lifecycle.
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -290,21 +299,20 @@ public class DeviceControlActivity extends Activity {
 		final Intent intent = getIntent();
 		mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
 		mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-		//mDeviceUUID = intent.getStringExtra(EXTRAS_DEVICE_UUID);
-		//mDeviceOthers = intent.getStringExtra(EXTRAS_DEVICE_OTHERS);
+
 		// Set up database connection
         /*datasource = new EventsDataSource(this);
         datasource.open();*/
         
 		// We create a new AuthSession so that we can use the Dropbox API.
-		//AndroidAuthSession session = buildSession();
-		//mDBApi = new DropboxAPI<AndroidAuthSession>(session);
+		AndroidAuthSession session = buildSession();
+		mDBApi = new DropboxAPI<AndroidAuthSession>(session);
 
 		mDataField = (TextView) findViewById(R.id.data_value);
 		mOtherField = (TextView) findViewById(R.id.other_value);
 		mOtherField.setText(mDeviceName+";"+mDeviceAddress);
-		/*mButtonSend = (ImageButton) findViewById(R.id.btnSend);
-		mButtonSend.setOnClickListener(new View.OnClickListener() {
+		//mButtonSend = (ImageButton) findViewById(R.id.btnSend);
+		/*mButtonSend.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// emailLog();
 				if (dropboxTokens == null) {
@@ -340,11 +348,10 @@ public class DeviceControlActivity extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-		// TODO: Lars added this
 		this.startService(gattServiceIntent);
 		bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
-		/*LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
 		if (mChart == null) {
 			initChart();
 			mChart = ChartFactory.getTimeChartView(this, mDataset, mRenderer,
@@ -352,7 +359,7 @@ public class DeviceControlActivity extends Activity {
 			layout.addView(mChart);
 		} else {
 			mChart.repaint();
-		}*/
+		}
 
 	}
 
@@ -360,14 +367,13 @@ public class DeviceControlActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		currentlyVisible = true;
-		
 		registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 		if (mBluetoothLeService != null) {
 			final boolean result = mBluetoothLeService.connect(mDeviceAddress);
 			Log.i(TAG, "Connect request result=" + result);
 		}
 
-		/*if (mDBApi.getSession().authenticationSuccessful()) {
+		if (mDBApi.getSession().authenticationSuccessful()) {
 			try {
 				// Mandatory call to complete the auth
 				mDBApi.getSession().finishAuthentication();
@@ -385,7 +391,7 @@ public class DeviceControlActivity extends Activity {
 				// e.getLocalizedMessage());
 				Log.i(TAG, "Error authenticating", e);
 			}
-		}*/
+		}
 	}
 
 	// this is called when the screen rotates.
@@ -414,6 +420,8 @@ public class DeviceControlActivity extends Activity {
 		super.onDestroy();
 		currentlyVisible = false;
 		unbindService(mServiceConnection);
+        Spotify.destroyPlayer(this);
+
 		// mBluetoothLeService = null;
 	}
 
@@ -458,16 +466,18 @@ public class DeviceControlActivity extends Activity {
 			mBluetoothLeService.disconnect();
 			return true;
 		case R.id.menu_dropbox:
-			//dropboxUpload();
+			dropboxUpload();
 			return true;
 		case R.id.menu_start_logging:
 			startLogging();
 			return true;
 		case R.id.menu_stop_logging:
-			stopLogging(0);
+			stopLogging("0");
 			return true;
 		case android.R.id.home:
-			onBackPressed();
+            mPlaySpotify = false;
+			Intent intent = new Intent(this, DeviceScanActivity.class);
+            startActivity(intent);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -499,25 +509,25 @@ public class DeviceControlActivity extends Activity {
                     if(cnter > 5){
                         Log.i(TAG,"Inside play spotify");
                         mPlaySpotify = true;
-                        stopLogging(Integer.parseInt(data));
+                        startSpotify(data);
                     }
                     cnter++;
                 }
 
 				long time = (new Date()).getTime();
 				int dataElement = Integer.parseInt(data);
-				//mCurrentSeries.add(time, dataElement);
-				//appendLog((new Date()).toString() + "," + data);
+				mCurrentSeries.add(time, dataElement);
+				appendLog((new Date()).toString() + "," + data);
 				//datasource.createEvent(1, time, dataElement);
 				// Storing last 600 only - should average... 
-				/*while (mCurrentSeries.getItemCount() > 60*10) {
+				while (mCurrentSeries.getItemCount() > 60*10) {
 					mCurrentSeries.remove(0);
-				}*/
+				}
 				
 				if (currentlyVisible) {
 					mDataField.setText("Pulse: " + data);
 
-					/*mRenderer.setYAxisMin(0);
+					mRenderer.setYAxisMin(0);
 					mRenderer.setYAxisMax(mCurrentSeries.getMaxY() + 20);
 
 					double minx = mCurrentSeries.getMinX();
@@ -532,7 +542,7 @@ public class DeviceControlActivity extends Activity {
 					}
 
 					mChart.repaint();
-					mChart.zoomReset();*/
+					mChart.zoomReset();
 				} 
 			}
 		} catch (Exception e) {
@@ -611,7 +621,7 @@ public class DeviceControlActivity extends Activity {
 		return intentFilter;
 	}
 
-	/*private String[] getKeys() {
+	private String[] getKeys() {
 		SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
 		String key = prefs.getString(ACCESS_KEY_NAME, null);
 		String secret = prefs.getString(ACCESS_SECRET_NAME, null);
@@ -659,7 +669,7 @@ public class DeviceControlActivity extends Activity {
 		upload.execute();
 		uploadFileRequested = false;
 	}
-	*/
+
 	public void appendLog(String text) {
 		File logFile = new File(Environment.getExternalStorageDirectory()
 				.getPath() + "/hrmlog.csv");
@@ -684,6 +694,52 @@ public class DeviceControlActivity extends Activity {
 		}
 	}
 
+    public void startSpotify(String data)
+    {
+        if(data != "0") {
+
+            SharedPreferences sharedPreferences = getSharedPreferences("player",Context.MODE_PRIVATE);
+            String player = sharedPreferences.getString("defaultPlayer", null);
+            Log.i(TAG,"The Player is "+player);
+
+            if(player.equals("media")) {
+
+                Intent intent = new Intent();
+                intent.setAction(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
+                //String genre = intent.getStringExtra("android.intent.extra.genre");
+                //String artist = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ARTIST);
+                String title = intent.getStringExtra(MediaStore.EXTRA_MEDIA_TITLE);
+                //String playlist = intent.getStringExtra("android.intent.extra.playlist");
+
+                intent.putExtra(SearchManager.QUERY, "Fuzon");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+            else
+            {
+                sharedpreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+                saveTracksForGenres();
+                Log.i("startSpotify","startSpotify");
+
+                int pulseInt = Integer.parseInt(data);
+                if(pulseInt < 60){
+                    genre = CLASSICAL;
+                }else if(pulseInt < 80){
+                    genre = COUNTRY;
+                }else if(pulseInt < 95) {
+                    genre = ROCK;
+                }else if(pulseInt < 120) {
+                    genre = POP_FITNESS;
+                }else {
+                    genre = ELECTRONIC_CARDIO;
+                }
+                SpotifyAuthentication.openAuthWindow(CLIENT_ID, "token", REDIRECT_URI,
+                        new String[]{"user-read-private", "streaming"}, null, this);
+            }
+        }
+
+    }
+
 	private void startLogging() {
 		//mButtonSend.setVisibility(View.VISIBLE);
 		//mButtonStop.setVisibility(View.VISIBLE);
@@ -695,36 +751,120 @@ public class DeviceControlActivity extends Activity {
 		logging = true;
 	}
 
-	private void stopLogging(int pulse) {
+	private void stopLogging(String pulse) {
 		//mButtonStop.setVisibility(View.GONE);
 		//mButtonStart.setVisibility(View.VISIBLE);
 		mBluetoothLeService.setCharacteristicNotification(
 				mNotifyCharacteristic, false);
 		invalidateOptionsMenu();
 		logging = false;
-
-        if(pulse > 0) {
-            SharedPreferences sharedPreferences = getSharedPreferences("player",Context.MODE_PRIVATE);
-            String player = sharedPreferences.getString("defaultPlayer", null);
-            Log.i(TAG,"The Player is "+player);
-            if(player.equals("spotify")) {
-                Intent playSpotify = new Intent(this, MainActivity.class);
-                playSpotify.putExtra(MainActivity.EXTRAS_DATA, pulse);
-                startActivity(playSpotify);
-            }
-            else if(player.equals("media")) {
-                mPlaySpotify = false;
-                Intent intent = new Intent();
-                intent.setAction(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH);
-                //String genre = intent.getStringExtra("android.intent.extra.genre");
-                //String artist = intent.getStringExtra(MediaStore.EXTRA_MEDIA_ARTIST);
-                //String title = intent.getStringExtra(MediaStore.EXTRA_MEDIA_TITLE);
-                String playlist = intent.getStringExtra("android.intent.extra.playlist");
-
-                intent.putExtra(SearchManager.QUERY, "");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            }
-        }
 	}
+
+
+    public void saveTracksForGenres(){
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString(ELECTRONIC_CARDIO, "5D0aA5aGrfMmtzpMc052n9");
+        editor.putString(POP_FITNESS, "2qbFI9BLhDBO7Ez99COaLq");
+        editor.putString(ROCK, "7mitXLIMCflkhZiD34uEQI");
+        editor.putString(COUNTRY, "2xYlyywNgefLCRDG8hlxZq");
+        editor.putString(CLASSICAL, "16Nvga6HrBxeJCCmrfmRi8");
+        editor.commit();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Uri uri = intent.getData();
+
+        if (uri != null) {
+            AuthenticationResponse response = SpotifyAuthentication.parseOauthResponse(uri);
+            Spotify spotify = new Spotify(response.getAccessToken());
+            mPlayer = spotify.getPlayer(this, "Musical Heart", this, new Player.InitializationObserver() {
+                @Override
+                public void onInitialized() {
+                    mPlayer.addConnectionStateCallback(DeviceControlActivity.this);
+                    mPlayer.addPlayerNotificationCallback(DeviceControlActivity.this);
+                    String track = getTrack(genre);
+
+                    //  mPlayer.play("spotify:track:5D0aA5aGrfMmtzpMc052n9");
+                    if (track != null) {
+                        Toast.makeText(getApplicationContext(), "Playing a song for you!", Toast.LENGTH_LONG).show();
+                        mPlayer.play("spotify:track:" + track);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Sorry, Could not find a song for you", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+                }
+            });
+        }
+    }
+
+    private static final String CLIENT_ID = "0828e6ce1d794db2bafa65d74e0d36b7";
+
+    private static final String REDIRECT_URI = "my-test-app://callback";
+    public static final String EXTRAS_DATA = "0";
+    String genre;
+    SharedPreferences sharedpreferences;
+    public static final String PREFERENCES = "MusicalHeartGenreTracks" ;
+    private Player mPlayer;
+
+
+    public static final String CLASSICAL = "classical";
+    public static final String COUNTRY = "country";
+    public static final String ROCK = "rock";
+    public static final String POP_FITNESS = "pop fitness";
+    public static final String ELECTRONIC_CARDIO = "electronic cardio";
+
+    public String getTrack(String genre){
+        sharedpreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        String result = sharedpreferences.getString(genre, null);
+        Log.d("getTrack", "retrieved track: "+result);
+        return result;
+    }
+
+    @Override
+    public void onLoggedIn() {
+        Log.d("MainActivity", "User logged in");
+    }
+
+    @Override
+    public void onLoggedOut() {
+        Log.d("MainActivity", "User logged out");
+    }
+
+    @Override
+    public void onLoginFailed(Throwable error) {
+        Log.d("MainActivity", "Login failed");
+    }
+
+    @Override
+    public void onTemporaryError() {
+        Log.d("MainActivity", "Temporary error occurred");
+    }
+
+    @Override
+    public void onNewCredentials(String s) {
+        Log.d("MainActivity", "User credentials blob received");
+    }
+
+    @Override
+    public void onConnectionMessage(String message) {
+        Log.d("MainActivity", "Received connection message: " + message);
+    }
+
+    @Override
+    public void onPlaybackEvent(PlayerNotificationCallback.EventType eventType, PlayerState playerState) {
+        Log.d("MainActivity", "Playback event received: " + eventType.name());
+    }
+
+    @Override
+    public void onPlaybackError(PlayerNotificationCallback.ErrorType errorType, String errorDetails) {
+        Log.d("MainActivity", "Playback error received: " + errorType.name());
+    }
+
+
 }

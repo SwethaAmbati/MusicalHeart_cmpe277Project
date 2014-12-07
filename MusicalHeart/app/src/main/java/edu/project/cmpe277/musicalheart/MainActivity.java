@@ -41,7 +41,7 @@ public class MainActivity extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_heart_beat);
+        setContentView(R.layout.heartrate);
         sharedpreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         saveTracksForGenres();
         Intent intent = getIntent();
@@ -61,6 +61,7 @@ public class MainActivity extends Activity implements
         }
         SpotifyAuthentication.openAuthWindow(CLIENT_ID, "token", REDIRECT_URI,
                 new String[]{"user-read-private", "streaming"}, null, this);
+
     }
 
     public void saveTracksForGenres(){

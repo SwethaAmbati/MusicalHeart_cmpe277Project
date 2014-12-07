@@ -38,7 +38,7 @@ public class NotificationService extends Service{
         notificationIntent.putExtra("message", val);
         notificationIntent.putExtra("reminder", true);
 
-        Notification notification = new Notification(R.drawable.ic_launcher,"Reminder", System.currentTimeMillis());
+        Notification notification = new Notification(R.drawable.icn_musicalheart,"Musical Heart Reminder", System.currentTimeMillis());
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP| Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pendingNotificationIntent = PendingIntent.getActivity( this.getApplicationContext(),0, notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT);

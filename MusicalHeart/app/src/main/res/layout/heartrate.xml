@@ -67,5 +67,12 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/chart"
+        android:layout_width="325dip"
+        android:layout_height="350dip"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center_vertical" />
 
 </LinearLayout>
